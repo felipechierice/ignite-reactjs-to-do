@@ -12,18 +12,38 @@ interface Task {
 
 export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskTitle, setNewTaskTitle] = useState<string>('');
+  const [idCounter, setIdCounter] = useState<number>(0);
+
+  function generateId(): number {
+    setIdCounter(idCounter + 1);
+    return idCounter;
+  }
 
   function handleCreateNewTask() {
-    // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+    if (!newTaskTitle.length) return;
+
+    const newTask: Task = {
+      id: generateId(),
+      title: newTaskTitle,
+      isComplete: false,
+    };
+
+    setTasks(state => [...state, newTask]);
+    setNewTaskTitle('');
   }
 
   function handleToggleTaskCompletion(id: number) {
-    // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    const taskToToggle = tasks.find(task => task.id === id);
+    if (!taskToToggle) return;
+
+    taskToToggle.isComplete = !taskToToggle.isComplete;
+
+    setTasks(tasks.map(task => task.id === id ? taskToToggle : task));
   }
 
   function handleRemoveTask(id: number) {
-    // Remova uma task da listagem pelo ID
+    setTasks(tasks.filter(task => task.id !== id));
   }
 
   return (
